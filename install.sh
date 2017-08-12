@@ -28,7 +28,7 @@ echo -e "instalando CONFVPS..."
 wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/CONFVPS3 > CONFVPS3
 wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/speedtest > speedtest
 chmod a+x CONFVPS3
-chmod a+x speetest 
+chmod a+x speedtest 
 cp speedtest /bin
 cp CONFVPS3 /bin
 rm CONFVPS3
