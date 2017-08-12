@@ -1466,7 +1466,7 @@ unistaller-confvps
 exit
 ;;
 10)
-vps-update
+update-vps
 ;;
 11)
 unistaller-modulos
