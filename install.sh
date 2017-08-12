@@ -25,8 +25,8 @@ echo "$nome" >/etc/dono
 mkdir /etc/CONFVPS
 mkdir /etc/CONFVPS/usuarios
 echo -e "instalando CONFVPS..."
-wget -o /dev/null -O- https://github.com/GLEMYSSON_LINUX/CONFVPS3/CONFVPS3 > CONFVPS3
-wget -o /dev/null -O- https://github.com/GLEMYSSON_LINUX/CONFVPS3/speedtest > speedtest
+wget -o /dev/null -O- https://github.com/GLEMYSSON-LINUX/CONFVPS3/CONFVPS3 > CONFVPS3
+wget -o /dev/null -O- https://github.com/GLEMYSSON-LINUX/CONFVPS3/speedtest > speedtest
 chmod a+x CONFVPS3
 chmod a+x speetest 
 mv speedtest /bin
