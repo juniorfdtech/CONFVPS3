@@ -9,7 +9,7 @@ read -p "Digite Seu Nome: " nome
   sleep 1
   exit
  fi
-IP=$(wget -o /dev/null -O- ttp://glemyson.hol.es)
+IP=$(wget -o /dev/null -O- http://glemyson.hol.es)
 read -p "Confirme Seu IP: " -e -i $IP IP
  if [[ -z "$IP" ]]; then
   echo -e "IP nao pode ficar em branco"
