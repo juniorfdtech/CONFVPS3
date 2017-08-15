@@ -1398,6 +1398,8 @@ rm /bin/CONFVPS3 >/dev/null
 rm /bin/speedtest >/dev/null
 rm /bin/limite
 rm -rf /etc/CONFVPS >/dev/null
+rm -rf /etc/CONFVPS/senha >/dev/null
+rm -rf /etc/CONFVPS/limite/dev/null
 rm /etc/IP >/dev/null
 rm /etc/dono >/dev/null
 rm /etc/IPMENU >/dev/null
@@ -1589,14 +1591,14 @@ else
  mkdir /etc/CONFVPS
 fi
 if [[ -d /etc/CONFVPS/senha ]]; then
-echo -n
+ echo -n
 else
-mkdir /etc/CONFVPS/senha
+ mkdir /etc/CONFVPS/senha
 fi
 if [[ -d /etc/CONFVPS/limite ]]; then
-echo -n
+ echo -n
 else
-mkdir /etc/CONFVPS/limite
+ mkdir /etc/CONFVPS/limite
 fi
 echo -e "$b=====================>>>"$v"CONFVPS 2.0"$b"<<<======================"
 echo -e " \033[1;37m      CONFVPS V: FINAL ["$Ver"By: GlEmYsSoN OliVe'R"$b"]\033[0m"
@@ -1645,7 +1647,7 @@ banner
 addhost
 ;;
 9)
-unistaller-confvps
+remove-confvps
 ;;
 0)
 exit

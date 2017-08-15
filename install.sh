@@ -2,7 +2,7 @@
 b="\033[1;37m"
 v="\033[1;32m"
 Ver="\033[1;31m"
-cd
+
 clear
 read -p "Digite Seu Nome: " nome
  if [[ -z "$nome" ]]; then
@@ -29,18 +29,21 @@ mkdir /etc/CONFVPS
 mkdir /etc/CONFVPS/senha
 mkdir /etc/CONFVPS/limite
 echo -e "\033[1;32mInstalando CONFVPS..."
+cd
 mkdir install
 cd install
 wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/CONFVPS3 > CONFVPS3
 wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/speedtest > speedtest
 wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/limite > limite
-for conf in `ls`
+for arqs in `ls`
 do
-chmod a+x $conf
-cp $conf /bin
-cd 
+rm /bin/$arqs 2>/dev/null
+mv $arqs /bin
+chmod +x /bin/$arqs
+done
+cd
 rm -rf install
 rm -rf install.sh
 echo -e "\033[1;32mInstalado."
 echo ''
-echo -e "\033[1;32mExculte o comando \033[1;32mCONFVPS3\033[1;37m"
+echo -e "\033[1;32mExculte o comando \033[1;37mCONFVPS3\033[1;37m"
