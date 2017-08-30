@@ -347,7 +347,7 @@ exit
 6)
 echo -e ""$b"          Portas adicionadas"
 echo '' 
-cat /etc/squid/squid.conf | grep 'http_port' | awk {'print $1'}
+cat /etc/squid/squid.conf | grep 'http_port' | awk {'print $2'}
 echo ''
 read -p "Digite a porta para remover: " porta
 port=$(cat /etc/squid/squid.conf | grep -v "http_port $porta")
@@ -1583,6 +1583,7 @@ sleep 10000
 }
 
 function update-confvps {
+cd
 echo -e "Atualizando CONFVPS..."
 wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/CONFVPS3 > CONFVPS3
 chmod a+x CONFVPS3
@@ -1725,7 +1726,7 @@ echo -e "$b───────────────────────
 echo -e " \033[1;37m      CONFVPS V: FINAL ["$Ver"By: GlEmYsSoN OliVe'R"$b"]\033[0m"
 echo -e "                 $v Att: 29/08/2017"
 echo -e "\033[1;37mEscolha uma das opçoẽs:    \033[1;37mPara Sair escolha a opcao \033[1;31m0\033[1;33m"
-echo -e "\033[1;37mSeu IP \033[1;37m(\033[1;32m$IP\033[1;37m)"
+echo -e "\033[1;37mSeu IP \033[1;37m(\033[1;32m$IP\033[1;37m)      \033[1;37mSeu nome: \033[1;32m$(cat /etc/dono)\033[1;37m"
 echo -e "                    $b["$v"0"$b"]$Ver Sair"
 echo ""
 echo -e "$b["$v"01$b]$Ver INSTALAR SQUID       $b["$v"11$b]$Ver DESISTALAR MODULOS"
@@ -1785,7 +1786,7 @@ unistaller-modulos
 alterar-senha
 ;;
 13)
-reboot-vps &
+reboot-vps
 ;;
 14)
 update-confvps
