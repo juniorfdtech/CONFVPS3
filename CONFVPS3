@@ -1,6 +1,6 @@
 #!/bin/bash
 clear #Limpar tela
-#CONFVPS3: V4
+#CONFVPS3: V5
 function squid3-installer {
 # squid3 installer
 # v5
