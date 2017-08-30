@@ -1197,7 +1197,7 @@ echo -e -n "\033[1;37mDeletar usuario \033[1;32m$user\033[1;37m: "
 if [[ "$res" = "s" || "$res" = "sim" ]]; then
 userpid=$(ps -u $user |awk {'print $1'})
 kill "$userpid" 2>/dev/null
-userdel -f $user
+sudo userdel -f $user
 echo -e "\033[1;37mUsuario: \033[1;31m$user \033[1;37mDeletado"
 echo ''
  rm /etc/CONFVPS/limite/$user >/dev/null 2>/dev/null
@@ -1586,7 +1586,7 @@ function update-confvps {
 echo -e "Atualizando CONFVPS..."
 wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/CONFVPS3 > CONFVPS3
 chmod a+x CONFVPS3
-mv CONFVPS3/bin
+mv CONFVPS3 /bin
 sleep 1
 if cat /bin/CONFVPS3 | grep CONFVPS3: | awk -F : '{ print $2 }' 1>/dev/null 2>/dev/null ; then
 echo -e "CONFVPS ja estar atualizado"
