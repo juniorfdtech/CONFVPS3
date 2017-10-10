@@ -8,10 +8,12 @@ b="\033[1;37m"
 v="\033[1;32m"
 Ver="\033[1;31m"
 clear
-reinstall () 
+reinstall ()
 {
 #!/bin/bash
 clear
+inter=$(cat /bin/CONFVPS3 | sed 's;INSTALAR SQUID ;GERENCIAR SQUID;')
+echo "$inter" > /bin/CONFVPS3
 b="\033[1;37m"
 v="\033[1;32m"
 Ver="\033[1;31m"
@@ -23,7 +25,7 @@ if [[ -e /etc/debian_version ]]; then
 fi
 VERSION_ID=$(cat /etc/os-release | grep "VERSION_ID")
 IP=$(cat /etc/IP)
-so=$(cat -n /etc/issue |grep 1 |cut -d' ' -f6,7,8 |sed 's/1//' |sed 's/	//')
+so=$(cat /etc/os-release | grep 'PRETTY_NAME' | awk -F = '{print $2}' | sed 's/"//g')
 PORTS="3128 8080 & 80"
 SSH="443 & 22"
 dono=$(cat /etc/dono)
@@ -43,80 +45,256 @@ echo -e "| $Ver---> "$b"SEU IP: "$Ver"       --->    "$v"$SIP  $b|
 echo -e ""$b"--------------------------------------------------------"
 echo ""
 echo -e "[[ "$Ver"--> "$b"NSTALANDO PRE REQUISITOS...]]"
-    if [[ "$OS" = 'debian' ]]; then
-      apt-get install squid -y >/dev/null 2>/dev/null
-      fi
       
-      if [[ "$OS" = 'debian' ]]; then
-      apt-get install squid3 -y >/dev/null 2>/dev/null
-      fi
-      
-		if [[ "$VERSION_ID" = 'VERSION_ID="7"' ]]; then
-			apt-get update 1>/dev/null 2>/dev/null
-            apt -get install squid3 -y 1>/dev/null 2>/dev/null
-		fi
-# debian 8
-if [[ "$VERSION_ID" = 'VERSION_ID="8"' ]]; then
-			apt-get update 1>/dev/null 2>/dev/null
-            if apt-get install squid -y 1>/dev/null 2>/dev/null
-             then
-         echo ""
-           else
-           apt-get install squid3 -y 1>/dev/null 2>/dev/null
-		fi
-fi
-#Ubuntu 12.04
-if [[ "$VERSION_ID" = 'VERSION_ID="12.04"' ]]; then
-			apt-get update 1>/dev/null 2>/dev/null
-            apt -get install squid3 -y 1>/dev/null 2>/dev/null
-		fi
-# Ubuntu 14.04
-		if [[ "$VERSION_ID" = 'VERSION_ID="14.04"' ]]; then
-			apt-get update 1>/dev/null 2>/dev/null
-            apt -get install squid3 -y 1>/dev/null 2>/dev/null
-		fi
-# Ubuntu 16.04
-if [[ "$VERSION_ID" = 'VERSION_ID="16.04"' ]]; then
-            apt-get update 1>/dev/null 2>/dev/null
-            apt -get install squid -y 1>/dev/null 2>/dev/null
-fi
-# Ubuntu 16.10
-if [[ "$VERSION_ID" = 'VERSION_ID="16.10"' ]]; then
-            apt-get update 1>/dev/null 2>/dev/null
-            apt -get install squid -y 1>/dev/null 2>/dev/null
-fi
-# Ubuntu 17.04
-if [[ "$VERSION_ID" = 'VERSION_ID="17.04"' ]]; then
-            apt-get update 1>/dev/null 2>/dev/null
-            apt -get install squid -y 1>/dev/null 2>/dev/null
-fi
-# Ubuntu 17.04
-if [[ "$VERSION_ID" = 'VERSION_ID="17.10"' ]]; then
-            apt-get update 1>/dev/null 2>/dev/null
-            apt -get install squid -y 1>/dev/null 2>/dev/null
-fi
-# CentOS
-if [[ "$OS" = 'centos' ]]; then
-yum update >/dev/null 2>/dev/null
-yum -y install squid >/dev/null 2>/dev/null
-fi
+if [[ "$VERSION_ID" = 'VERSION_ID="7"' ]]; then
+apt-get update 1>/dev/null 2>/dev/null
+apt-get install squid3 -y 1>/dev/null 2>/dev/null
+sleep 1
 echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
-sleep 2
-
 echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SSH...]]"
-if cat /etc/ssh/sshd_config | grep "Port 443" > /dev/null; then
-true
-else
 echo 'Port 443
 PermitRootLogin yes
 PubkeyAuthentication yes
-PasswordAuthentication yes
-' >> /etc/ssh/sshd_config
-fi
-sleep 2
+PasswordAuthentication yes' >> /etc/ssh/sshd_config
+sleep 1
 echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SQUID...]]"
+echo "http_port 80 
+http_port 8080 
+http_port 8799 
+http_port 3128 visible_hostname $donu 
+acl ip dstdomain $IP http_access allow ip" > /etc/squid/squid.conf echo 'acl accept dstdomain -i "/etc/payloads"
+http_access allow accept 
+acl local dstdomain localhost 
+http_access allow local 
+acl iplocal dstdomain 127.0.0.1 
+http_access allow iplocal 
+http_access deny all' >> /etc/squid/squid.conf
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+sleep 1
+echo -e "$b""[[ "$Ver"--> "$b"RENICIANDO SERVICOS...]]"
+service ssh restart >/dev/null 2>/dev/null
+service squid3 restart >/dev/null 2>/dev/null
+echo ".claro.com.br
+.claro.com.sv
+.vivo.com.br
+.ddivulga.com" > /etc/payloads
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo ""
+echo -e ""$b"--------------------------------------------------------"
+echo -e "SQUID INSTALADO COM SUCESSO, AGORA CRIE UM USUARIO E\nTESTE PRA VER SI ESTAR TUDO OK"
+echo -e ""$b"--------------------------------------------------------"
+exit
+		fi
+# debian 8
+if [[ "$VERSION_ID" = 'VERSION_ID="8"' ]]; then
+apt-get update 1>/dev/null 2>/dev/null
+if apt-get install squid -y 1>/dev/null 2>/dev/null
+then
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SSH...]]"
+echo 'Port 443
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes' >> /etc/ssh/sshd_config
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SQUID...]]"
+echo "http_port 80 
+http_port 8080 
+http_port 8799 
+http_port 3128 visible_hostname $donu 
+acl ip dstdomain $IP http_access allow ip" > /etc/squid/squid.conf echo 'acl accept dstdomain -i "/etc/payloads"
+http_access allow accept 
+acl local dstdomain localhost 
+http_access allow local 
+acl iplocal dstdomain 127.0.0.1 
+http_access allow iplocal 
+http_access deny all' >> /etc/squid/squid.conf 
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+sleep 1
+echo -e "$b""[[ "$Ver"--> "$b"RENICIANDO SERVICOS...]]"
+service ssh restart >/dev/null 2>/dev/null
+service squid restart >/dev/null 2>/dev/null
+echo ".claro.com.br
+.claro.com.sv
+.vivo.com.br
+.ddivulga.com" > /etc/payloads
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo ""
+echo -e ""$b"--------------------------------------------------------"
+echo -e "SQUID INSTALADO COM SUCESSO, AGORA CRIE UM USUARIO E\nTESTE PRA VER SI ESTAR TUDO OK"
+echo -e ""$b"--------------------------------------------------------"
+exit
+else
+apt-get install squid3 -y 1>/dev/null 2>/dev/null
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SSH...]]"
+echo 'Port 443
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes' >> /etc/ssh/sshd_config
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SQUID...]]"
+echo "# ACLs e Liberações
+acl accept dstdomain -i $IP
+acl allowed dstdomain -i /etc/payloads
+acl combr dstdomain -i .com.br
+acl com dstdomain -i .com
+acl all src 0.0.0.0/0.0.0.0
+http_access allow accept
+http_access allow allowed
+http_access allow combr
+http_access allow com
+http_access deny all
+always_direct allow all
+# Anonimo
+forwarded_for off
+# Pipeline
+#pipeline_prefetch on
+# Portas 
+http_port 80
+http_port 8080
+http_port 3128" >/etc/squid3/squid.conf
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+sleep 1
+echo -e "$b""[[ "$Ver"--> "$b"RENICIANDO SERVICOS...]]"
+service ssh restart >/dev/null 2>/dev/null
+service squid3 restart >/dev/null 2>/dev/null
+echo ".claro.com.br
+.claro.com.sv
+.vivo.com.br
+.ddivulga.com" > /etc/payloads
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo ""
+echo -e ""$b"--------------------------------------------------------"
+echo -e "SQUID INSTALADO COM SUCESSO, AGORA CRIE UM USUARIO E\nTESTE PRA VER SI ESTAR TUDO OK"
+echo -e ""$b"--------------------------------------------------------"
+exit
+fi
+fi
 
-if [[ -d /etc/squid ]]; then
+#Ubuntu 12.04
+if [[ "$VERSION_ID" = 'VERSION_ID="12.04"' ]]; then
+apt-get update 1>/dev/null 2>/dev/null
+apt -get install squid3 -y 1>/dev/null 2>/dev/null
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SSH...]]"
+echo 'Port 443
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes' >> /etc/ssh/sshd_config
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SQUID...]]"
+echo "# ACLs e Liberações
+acl accept dstdomain -i $IP
+acl allowed dstdomain -i /etc/payloads
+acl combr dstdomain -i .com.br
+acl com dstdomain -i .com
+acl all src 0.0.0.0/0.0.0.0
+http_access allow accept
+http_access allow allowed
+http_access allow combr
+http_access allow com
+http_access deny all
+always_direct allow all
+# Anonimo
+forwarded_for off
+# Pipeline
+#pipeline_prefetch on
+# Portas 
+http_port 80
+http_port 8080
+http_port 3128" >/etc/squid3/squid.conf
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+sleep 1
+echo -e "$b""[[ "$Ver"--> "$b"RENICIANDO SERVICOS...]]"
+service ssh restart >/dev/null 2>/dev/null
+service squid3 restart >/dev/null 2>/dev/null
+echo ".claro.com.br
+.claro.com.sv
+.vivo.com.br
+.ddivulga.com" > /etc/payloads
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo ""
+echo -e ""$b"--------------------------------------------------------"
+echo -e "SQUID INSTALADO COM SUCESSO, AGORA CRIE UM USUARIO E\nTESTE PRA VER SI ESTAR TUDO OK"
+echo -e ""$b"--------------------------------------------------------"
+exit
+fi
+# Ubuntu 14.04
+if [[ "$VERSION_ID" = 'VERSION_ID="14.04"' ]]; then
+apt-get update 1>/dev/null 2>/dev/null
+apt-get install squid3 -y 1>/dev/null 2>/dev/null
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SSH...]]"
+echo 'Port 443
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes' >> /etc/ssh/sshd_config
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SQUID...]]"
+echo "# ACLs e Liberações
+acl accept dstdomain -i $IP
+acl allowed dstdomain -i /etc/payloads
+acl combr dstdomain -i .com.br
+acl com dstdomain -i .com
+acl all src 0.0.0.0/0.0.0.0
+http_access allow accept
+http_access allow allowed
+http_access allow combr
+http_access allow com
+http_access deny all
+always_direct allow all
+# Anonimo
+forwarded_for off
+# Pipeline
+#pipeline_prefetch on
+# Portas 
+http_port 80
+http_port 8080
+http_port 3128" >/etc/squid3/squid.conf
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+sleep 1
+echo -e "$b""[[ "$Ver"--> "$b"RENICIANDO SERVICOS...]]"
+service ssh restart >/dev/null 2>/dev/null
+service squid3 restart >/dev/null 2>/dev/null
+echo ".claro.com.br
+.claro.com.sv
+.vivo.com.br
+.ddivulga.com" > /etc/payloads
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo ""
+echo -e ""$b"--------------------------------------------------------"
+echo -e "SQUID INSTALADO COM SUCESSO, AGORA CRIE UM USUARIO E\nTESTE PRA VER SI ESTAR TUDO OK"
+echo -e ""$b"--------------------------------------------------------"
+exit
+fi
+# Ubuntu 16.04
+if [[ "$VERSION_ID" = 'VERSION_ID="16.04"' ]]; then
+apt-get update 1>/dev/null 2>/dev/null
+apt-get install squid -y 1>/dev/null 2>/dev/null
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SSH...]]"
+echo 'Port 443
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes' >> /etc/ssh/sshd_config
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
 echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SQUID...]]"
 echo "# ACLs e Liberações
 acl accept dstdomain -i $IP
@@ -140,8 +318,35 @@ http_port 8080
 http_port 3128" >/etc/squid/squid.conf
 sleep 1
 echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
-else
-echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SQUID3...]]"
+sleep 1
+echo -e "$b""[[ "$Ver"--> "$b"RENICIANDO SERVICOS...]]"
+service ssh restart >/dev/null 2>/dev/null
+service squid restart >/dev/null 2>/dev/null
+echo ".claro.com.br
+.claro.com.sv
+.vivo.com.br
+.ddivulga.com" > /etc/payloads
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo ""
+echo -e ""$b"--------------------------------------------------------"
+echo -e "SQUID INSTALADO COM SUCESSO, AGORA CRIE UM USUARIO E\nTESTE PRA VER SI ESTAR TUDO OK"
+echo -e ""$b"--------------------------------------------------------"
+exit
+fi
+# Ubuntu 16.10
+if [[ "$VERSION_ID" = 'VERSION_ID="16.10"' ]]; then
+apt-get update 1>/dev/null 2>/dev/null
+apt-get install squid -y 1>/dev/null 2>/dev/null
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SSH...]]"
+echo 'Port 443
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes' >> /etc/ssh/sshd_config
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SQUID...]]"
 echo "# ACLs e Liberações
 acl accept dstdomain -i $IP
 acl allowed dstdomain -i /etc/payloads
@@ -161,18 +366,13 @@ forwarded_for off
 # Portas 
 http_port 80
 http_port 8080
-http_port 3128" >/etc/squid3/squid.conf
-sleep 2
+http_port 3128" >/etc/squid/squid.conf
+sleep 1
 echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
-fi
+sleep 1
 echo -e "$b""[[ "$Ver"--> "$b"RENICIANDO SERVICOS...]]"
-if service ssh restart >/dev/null 2>/dev/null; then
+service ssh restart >/dev/null 2>/dev/null
 service squid restart >/dev/null 2>/dev/null
-service squid3 restart >/dev/null 2>/dev/null
-else
-service sshd restart >/dev/null 2>/dev/null
-service squid restart >/dev/null 2>/dev/null
-fi
 echo ".claro.com.br
 .claro.com.sv
 .vivo.com.br
@@ -183,6 +383,160 @@ echo ""
 echo -e ""$b"--------------------------------------------------------"
 echo -e "SQUID INSTALADO COM SUCESSO, AGORA CRIE UM USUARIO E\nTESTE PRA VER SI ESTAR TUDO OK"
 echo -e ""$b"--------------------------------------------------------"
+exit
+fi
+if [[ "$OS" = 'centos' ]]; then
+yum update >/dev/null 2>/dev/null
+yum -y install squid >/dev/null 2>/dev/null
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SSH...]]"
+echo 'Port 443
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes' >> /etc/ssh/sshd_config
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SQUID...]]"
+echo "# ACLs e Liberações
+acl accept dstdomain -i $IP
+acl allowed dstdomain -i /etc/payloads
+acl combr dstdomain -i .com.br
+acl com dstdomain -i .com
+acl all src 0.0.0.0/0.0.0.0
+http_access allow accept
+http_access allow allowed
+http_access allow combr
+http_access allow com
+http_access deny all
+always_direct allow all
+# Anonimo
+forwarded_for off
+# Pipeline
+#pipeline_prefetch on
+# Portas 
+http_port 80
+http_port 8080
+http_port 3128" >/etc/squid/squid.conf
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+sleep 1
+echo -e "$b""[[ "$Ver"--> "$b"RENICIANDO SERVICOS...]]"
+service sshd restart >/dev/null 2>/dev/null
+service squid restart >/dev/null 2>/dev/null
+echo ".claro.com.br
+.claro.com.sv
+.vivo.com.br
+.ddivulga.com" > /etc/payloads
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo ""
+echo -e ""$b"--------------------------------------------------------"
+echo -e "SQUID INSTALADO COM SUCESSO, AGORA CRIE UM USUARIO E\nTESTE PRA VER SI ESTAR TUDO OK"
+echo -e ""$b"--------------------------------------------------------"
+exit
+fi
+
+# Ubuntu 17.04
+if [[ "$VERSION_ID" = 'VERSION_ID="17.04"' ]]; then
+apt-get update 1>/dev/null 2>/dev/null
+apt-get install squid -y 1>/dev/null 2>/dev/null
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SSH...]]"
+echo 'Port 443
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes' >> /etc/ssh/sshd_config
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SQUID...]]"
+echo "# ACLs e Liberações
+acl accept dstdomain -i $IP
+acl allowed dstdomain -i /etc/payloads
+acl combr dstdomain -i .com.br
+acl com dstdomain -i .com
+acl all src 0.0.0.0/0.0.0.0
+http_access allow accept
+http_access allow allowed
+http_access allow combr
+http_access allow com
+http_access deny all
+always_direct allow all
+# Anonimo
+forwarded_for off
+# Pipeline
+#pipeline_prefetch on
+# Portas 
+http_port 80
+http_port 8080
+http_port 3128" >/etc/squid/squid.conf
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+sleep 1
+echo -e "$b""[[ "$Ver"--> "$b"RENICIANDO SERVICOS...]]"
+service ssh restart >/dev/null 2>/dev/null
+service squid restart >/dev/null 2>/dev/null
+echo ".claro.com.br
+.claro.com.sv
+.vivo.com.br
+.ddivulga.com" > /etc/payloads
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo ""
+echo -e ""$b"--------------------------------------------------------"
+echo -e "SQUID INSTALADO COM SUCESSO, AGORA CRIE UM USUARIO E\nTESTE PRA VER SI ESTAR TUDO OK"
+echo -e ""$b"--------------------------------------------------------"
+exit
+fi
+if [[ "$OS" = 'centos' ]]; then
+yum update >/dev/null 2>/dev/null
+yum -y install squid >/dev/null 2>/dev/null
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SSH...]]"
+echo 'Port 443
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes' >> /etc/ssh/sshd_config
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo -e ""$b"[[ "$Ver"--> "$b"ALTERANDO SQUID...]]"
+echo "# ACLs e Liberações
+acl accept dstdomain -i $IP
+acl allowed dstdomain -i /etc/payloads
+acl combr dstdomain -i .com.br
+acl com dstdomain -i .com
+acl all src 0.0.0.0/0.0.0.0
+http_access allow accept
+http_access allow allowed
+http_access allow combr
+http_access allow com
+http_access deny all
+always_direct allow all
+# Anonimo
+forwarded_for off
+# Pipeline
+#pipeline_prefetch on
+# Portas 
+http_port 80
+http_port 8080
+http_port 3128" >/etc/squid/squid.conf
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+sleep 1
+echo -e "$b""[[ "$Ver"--> "$b"RENICIANDO SERVICOS...]]"
+service sshd restart >/dev/null 2>/dev/null
+service squid restart >/dev/null 2>/dev/null
+echo ".claro.com.br
+.claro.com.sv
+.vivo.com.br
+.ddivulga.com" > /etc/payloads
+sleep 1
+echo -e "$b  ["$v"OK$b]  "$v"Sucesso..."
+echo ""
+echo -e ""$b"--------------------------------------------------------"
+echo -e "SQUID INSTALADO COM SUCESSO, AGORA CRIE UM USUARIO E\nTESTE PRA VER SI ESTAR TUDO OK"
+echo -e ""$b"--------------------------------------------------------"
+exit
+fi
 }
 if [[ -f /etc/squid3/squid.conf ]]; then
     echo -e "      "$b"SQUID3 INSTALADO!"
@@ -378,6 +732,8 @@ function vpn-installer {
 # v1
 #!/bin/bash
 # OPEN VPN V1
+inter=$(cat /bin/CONFVPS3 | sed 's;INSTALAR OPENVPN ;GERENCIAR OPENVPN;')
+echo "$inter" > /bin/CONFVPS3
 b="\033[1;37m"
 v="\033[1;32m"
 Ver="\033[1;31m"
@@ -881,6 +1237,8 @@ if [[ "$porta" = '80' ]]; then
               echo -e ""$b"["$v"OK"$b"]$b Sucesso..."
               echo ''
               echo -e "\033[1;37mInstalacao finalizada com sucesso."
+              inter=$(cat /bin/CONFVPS3 | sed 's;INSTALAR DROPBEAR ;GERENCIAR DROPBEAR;')
+	      echo "$inter" > /bin/CONFVPS3
               exit 69
     fi
     if [[ "$rees" = 'n' ]]; then
@@ -895,7 +1253,7 @@ fi
  fi
 if [[ "$porta" = '443' ]]; then
   if cat /etc/ssh/sshd_config |grep "443" >/dev/null; then
-    echo -e ""$Ver"Porta 443 esta adicionanda no sshd!"
+    echo -e ""$Ver"Porta 443 esta adicionada no sshd!"
     echo ''
     echo -e ""$b"Para continuar com a instalacao do dropbear\nna porta 443 teras que remover a porta 443 do sshd"
     echo ''
@@ -927,7 +1285,10 @@ echo "DROPBEAR_PORT=443" >> /etc/default/dropbear
         sleep 1
         echo -e ""$b"["$v"OK"$b"]$b Sucesso..."
         echo ''
+        echo -e "\033[1;37mInstalacao finalizada com sucesso."
         exit 69
+        inter=$(cat /bin/CONFVPS3 | sed 's;INSTALAR DROPBEAR ;GERENCIAR DROPBEAR;')
+        echo "$inter" > /bin/CONFVPS3
     else
     	echo -e -n ""
     fi
@@ -955,6 +1316,8 @@ fi
               echo -e ""$b"["$v"OK"$b"]$b Sucesso..."
               echo ''
               echo -e "\033[1;37mInstalacao finalizada com sucesso."
+              inter=$(cat /bin/CONFVPS3 | sed 's;INSTALAR DROPBEAR ;GERENCIAR DROPBEAR;')
+	      echo "$inter" > /bin/CONFVPS3
               exit 69
 }
 
@@ -1013,8 +1376,13 @@ b="\033[1;37m"
 v="\033[1;32m"
 Ver="\033[1;31m"
 clear
+while :
+do
+deluserr ()
+{
+clear
 echo -e "==================Usuarios===================="
-awk -F : '$3 >= 1000 { print $1 }' /etc/passwd | grep -v "nobody" > /tmp/users.txt
+awk -F : '$3 >= 1000 { print $1 }' /etc/passwd | grep -v "nobody"| grep -v "glemysson" > /tmp/users.txt
 i=0
 rm /tmp/users 1>/dev/null 2>/dev/null
 echo -e "                  $b["$v"0$b] -$Ver Menu"
@@ -1022,31 +1390,65 @@ echo ''
 while read usuario
 do
 i=$(($i+1))
-echo -e "$b["$v"$i$b] -$Ver $usuario"
+if [[ $i = [1-9] ]]; then
+c="0$i"
+else
+c=$i
+fi
+echo -e "$b["$v"$c$b] -$Ver $usuario"
 echo "$i: $usuario" >> /tmp/users
 done < /tmp/users.txt
+}
+deluserr
 echo ''
-num=$(cat /tmp/users | wc -l)
+if [[ -f /tmp/users ]]; then
+mum=$(cat /tmp/users | wc -l)
 if [[ "$num" = '0' ]]; then
 echo -e "\033[1;31mVoce nao tem usuarios existente\033[1;37m"
 exit
 else
 true
 fi
+else
+echo -e "\033[1;31mVoce nao tem usuarios existente\033[1;37m"
+exit
+fi
 echo -n -e "\033[1;37mQual deseja deletar: ";read del
+if [[ "$del" = [1-1000] ]]; then
+true
+else
+echo -e "\033[91mopcao invalida"
+sleep 1
+deluserr
+exit
+fi
 if [[ "$del" = '0' ]]; then
 CONFVPS3
 fi
-user=$(cat /tmp/users | grep $del: | awk -F : {'print $2'})
+user=$(cat /tmp/users|grep $del:|awk -F : {'print $2'})
 us=$(echo $user)
-echo -e "Deletando usuario \033[1;32m$us\033[1;37m"
+echo -e "Deletando usuario \033[1;32m$us\033[1;37m" 
+  cd /etc/CONFVPS3/usuarios
+  rm -rf $us
+  cd /etc/CONFVPS3/users-info
+  rm -rf $us
+  cd /etc/tempo
+  rm -rf $user
+ if cat /etc/crontab | grep $us 1>/dev/null 2>/dev/null; then
+  limp=$(cat /etc/crontab | grep -v $us)
+  echo "$limp" > /etc/crontab
+ else
+  true
+ fi
 pids=$(ps -u $us 1>/dev/null 2>/dev/null |awk {'print $1'})
  kill "$pids" >/dev/null 2>/dev/null
- rm "/etc/CONFVPS/limite/$us" 1>/dev/null 2>/dev/null
- rm "/etc/CONFVPS/senha/$us" 1>/dev/null 2>/dev/null
- rm "/etc/usuarios/$us.sh" 1>/dev/null 2>/dev/null
  userdel -f $us 1>/dev/null 2>/dev/null
 echo -e "Usuario \033[1;32m$us\033[1;37m Deletado"
+read -p "Continuar ou 0 pra voltar ao menu: " opt
+if [[ $opt = 0 ]]; then
+CONFVPS3
+fi
+done
 ;;
 2)
 clear
@@ -1078,8 +1480,7 @@ echo -e "\033[1;33mProxy:\033[1;37m $IP"
 echo -e "\033[1;33mPortas: \033[1;37m 3128 8080 & 80"
 echo -e "\033[1;33mValidade:\033[1;37m $validadebr"
 echo -e "\033[1;33mLimite de conexoes:\033[1;37m $limit"
-echo "$senha" >/etc/CONFVPS/senha/$name
-echo "$limit" >/etc/CONFVPS/limite/$name
+echo "$name:$senha:$validadebr:$limit" > /etc/CONFVPS3/users-info/$name
 exit
 ;;
 3)
@@ -1129,7 +1530,8 @@ fi
 read -p "Usuario: " name
 if cat /etc/passwd |grep $name: |grep -vi [a-z]$name |grep -v [0-9]$name > /dev/null
 	then
-read -p "Digite o Novo Limite: " limite
+read -p "Digite o Novo Limite: " 
+
 limite $name $limite
 echo -e "Novo Limite Aplicado\nAo Usuario $v$name"
 else
@@ -1200,13 +1602,22 @@ kill "$userpid" 2>/dev/null
 sudo userdel -f $user
 echo -e "\033[1;37mUsuario: \033[1;31m$user \033[1;37mDeletado"
 echo ''
- rm /etc/CONFVPS/limite/$user >/dev/null 2>/dev/null
- rm /etc/CONFVPS/senha/$user >/dev/null 2>/dev/null
- rm /etc/usuarios/$user >/dev/null 2>/dev/null
+  cd /etc/CONFVPS3/usuarios
+  rm -rf $us
+  cd /etc/CONFVPS3/users-info
+  rm -rf $us
+  cd /etc/tempo
+  rm -rf $user
+ if cat /etc/crontab | grep $us 1>/dev/null 2>/dev/null; then
+  limp=$(cat /etc/crontab | grep -v $us)
+  echo "$limp" > /etc/crontab
+ else
+  true
+ fi
 fi
 if [[ "$res" = "n" || "$res" = "nao" ]]; then
 echo "$user" |cut -d: -f3 1> /dev/null 2>/dev/null
-echo -e "\033[1;37mUsuario \033[1;31m$user \033[1;37mnao deletado"
+echo -e "\033[1;37mUsuario \033[1;32m$user \033[1;37mnao deletado"
 echo ''
 fi
 done
@@ -1231,7 +1642,7 @@ useradd -s /bin/false -M $nome$c -e $validade
 ( echo "$senha" ; echo "$senha" ) | passwd $nome$c 2>/dev/null
 limite $nome$c $limite
 echo -e ""$b"Usuario: $v$nome$c    "$b"Senha: $v$senha   "$b"Data.E: $v$validadebr"
-echo "$senha" >/etc/CONFVPS/senha/$nome$c
+echo "$nome$c:$senha:$validadebr:$limite" >/etc/CONFVPS3/users-info/$nome$c
 done
 ;;
 10)
@@ -1363,8 +1774,7 @@ validadebr=$(date '+%d/%m/%C%y' -d " +$data days")
 sudo useradd -M -s /bin/false $usuario -e $validade 1>/dev/null 2>/dev/null
 (echo $senha ; echo $senha) | passwd $usuario 1>/dev/null 2>/dev/null
 echo -e "\033[1;33mUsuario: \033[1;37m$usuario \033[1;33mSenha: \033[1;37m$senha \033[1;33mData: \033[1;37m$validadebr \033[1;33mLimite: \033[1;37m$limite"
-echo "$senha" >/etc/CONFVPS/senha/$usuario
-echo "$limite" >/etc/CONFVPS/limite/$usuario
+echo "$usuario:$senha:$validadebr:$limit" > /etc/CONFVPS3/users-info/$usuario
 fi
 done
 ;;
@@ -1496,7 +1906,7 @@ read -p "host: " host
 echo ".$host" >>/etc/payloads
 sleep 1
 echo -e "\033[1;37mSua host foi adiconada com sucesso\033[1;31m"
-cat /etc/paylods
+cat /etc/payloads
 exit
 }
 
@@ -1511,7 +1921,7 @@ rm -rf /etc/CONFVPS/limite/dev/null
 rm /etc/IP >/dev/null
 rm /etc/dono >/dev/null
 rm /etc/IPMENU >/dev/null
-rm -rf /etc/usuarios >/dev/null
+rm -rf /etc/CONFVPS3 >/dev/null
 sleep 1
 echo -e "CONFVPS Removido."
 }
@@ -1705,45 +2115,75 @@ else
 	fi
 fi
 clear 
-if [[ -d /etc/CONFVPS ]]; then
+if [[ -d /etc/CONFVPS3 ]]; then
  echo -n
 else
- mkdir /etc/CONFVPS
+ mkdir /etc/CONFVPS3
 fi
-if [[ -d /etc/CONFVPS/senha ]]; then
+if [[ -d /etc/CONFVPS3/users-info ]]; then
  echo -n
 else
- mkdir /etc/CONFVPS/senha
+ mkdir /etc/CONFVPS3/users-info
 fi
-if [[ -d /etc/CONFVPS/limite ]]; then
+if [[ -d /etc/CONFVPS3/usuarios ]]; then
  echo -n
 else
- mkdir /etc/CONFVPS/limite
+ mkdir /etc/CONFVPS3/usuarios
 fi
 IP=$(cat /etc/IPMENU)
 ram1=$(free -h | grep -i mem | awk {'print $2'})
 ram2=$(free -h | grep -i mem | awk {'print $4'})
 ram3=$(free -h | grep -i mem | awk {'print $3'})
-echo -e "$b────────────────────────["$v"CONFVPS 2.0"$b"]────────────────────────"
-echo -e "$b─────────────────────────────────────────────────────────────"
-echo -e " \033[1;37m      CONFVPS3 V: FINAL ["$Ver"By: GlEmYsSoN OliVe'R"$b"]\033[0m"
-echo -e "                 $v Att: 05/09/2017"
-echo -e "\033[1;37mEscolha uma das opçoẽs:    \033[1;37mPara Sair escolha a opcao \033[1;31m0\033[1;33m"
-echo -e "\033[1;37mSeu IP \033[1;31m[\033[1;32m$IP\033[1;31m]      \033[1;37mSeu nome \033[1;31m[\033[1;32m$(cat /etc/dono)\033[1;31m]"
+h1=$(date| awk {'print $4'}|awk -F : {'print $1'})
+h2=$(date| awk {'print $4'}|awk -F : {'print $2'})
+dia=$(date | awk {'print $3'})
+mes=$(date | awk {'print $2'})
+ano=$(date | awk {'print $6'})
+if [[ "$mes" = "jan" || "$mes" = "jan" ]]; then
+mes=01
+elif [[ "$mes" = "feb" || "$mes" = "fev" ]]; then
+mes=02
+elif [[ "$mes" = "mar" || "$mes" = "mar" ]]; then
+mes=03
+elif [[ "$mes" = "apr" || "$mes" = "abr" ]]; then
+mes=04
+elif [[ "$mes" = "may" || "$mes" = "mai" ]]; then
+mes=05
+elif [[ "$mes" = "jun" || "$mes" = "jun" ]]; then
+mes=06
+elif [[ "$mes" = "jul" || "$mes" = "jul" ]]; then
+mes=07
+elif [[ "$mes" = "ago" || "$mes" = "ago" ]]; then
+mes=08
+elif [[ "$mes" = "set" || "$mes" = "sep" ]]; then
+mes=09
+elif [[ "$mes" = "out" || "$mes" = "oct" ]]; then
+mes=10
+elif [[ "$mes" = "nov" || "$mes" = "nov" ]]; then
+mes=11
+elif [[ "$mes" = "dec" || "$mes" = "dez" ]]; then
+mes=12
+fi
+echo -e "$b============================================================="
+echo -e "    \033[1;37mData: \033[1;32m$dia\033[1;37m/\033[1;32m$mes\033[1;37m/\033[1;32m$ano          \033[1;37mHora: \033[1;32m"$h1"hrs\033[1;37m:\033[1;32m$h2"Min""  
+echo -e "$b============================================================="
+echo -e "  \033[1;37mCONFVPS3 VERSAO: FINAL     ["$Ver"By: GlEmYsSoN OliVe'R"$b"]\033[0m"
+echo -e "\033[1;37mEscolha uma das opçoẽs     \033[1;37mPara Sair escolha a opcao \033[1;31m0\033[1;33m"
+echo -e "  \033[1;37mSeu IP \033[1;31m[\033[1;32m$IP\033[1;31m]          \033[1;37mSeu nome \033[1;31m[\033[1;32m$(cat /etc/dono)\033[1;31m]"
 echo -e "\033[1;37mMemoria ram total: \033[1;32m$ram1    \033[1;37mLivre: \033[1;32m$ram2     \033[1;37mUsado: \033[1;32m$ram3"
 echo ""
-echo -e "$b["$v"01$b]$Ver INSTALAR SQUID       $b["$v"11$b]$Ver DESISTALAR MODULOS"
-echo -e "$b["$v"02$b]$Ver INSTALAR DROPBEAR    $b["$v"12$b]$Ver ALTERAR SENHA ROOT"
-echo -e "$b["$v"03$b]$Ver INSTALAR OPENVPN     $b["$v"13$b]$Ver RENICIAR VPS"
-echo -e "$b["$v"04$b]$Ver GERENCIAR USUARIOS   $b["$v"14$b]$Ver ATUALIZAR CONFVPS"
-echo -e "$b["$v"05$b]$Ver MONITOR SSH          $b["$v"15$b]$Ver OCULTAR IP DO MENU"
-echo -e "$b["$v"06$b]$Ver SPEEDTEST            $b["$v"16$b]$Ver REMOVER HOST"
-echo -e "$b["$v"07$b]$Ver ADD BANNER           $b["$v"17$b]$Ver RENICIAR VPS MEIA NOITE"
+echo -e "$b["$v"01$b]$Ver INSTALAR SQUID            $b["$v"11$b]$Ver DESISTALAR MODULOS"
+echo -e "$b["$v"02$b]$Ver INSTALAR DROPBEAR         $b["$v"12$b]$Ver ALTERAR SENHA ROOT"
+echo -e "$b["$v"03$b]$Ver INSTALAR OPENVPN          $b["$v"13$b]$Ver RENICIAR VPS"
+echo -e "$b["$v"04$b]$Ver GERENCIAR USUARIOS        $b["$v"14$b]$Ver ATUALIZAR CONFVPS3"
+echo -e "$b["$v"05$b]$Ver MONITOR SSH               $b["$v"15$b]$Ver OCULTAR IP DO MENU"
+echo -e "$b["$v"06$b]$Ver SPEEDTEST                 $b["$v"16$b]$Ver REMOVER HOST"
+echo -e "$b["$v"07$b]$Ver ADD BANNER"
 echo -e "$b["$v"08$b]$Ver ADDHOST"
-echo -e "$b["$v"09$b]$Ver REMOVER CONFVPS"
+echo -e "$b["$v"09$b]$Ver REMOVER CONFVPS3"
 echo -e "$b["$v"10$b]$Ver UPDATE VPS"
-echo -e "$b─────────────────────────────────────────────────────────────"
-echo -e "$b────────────────────────["$v"CONFVPS 2.0"$b"]────────────────────────"
+echo -e "$b============================================================="
+echo -e "$b========================["$v"CONFVPS 3.0"$b"]========================"
 echo -e "$Ver"
 echo -e "$b┌─["$v"Escolha uma opcao"$b"]";read -p "└──> "  opcao
 clear
