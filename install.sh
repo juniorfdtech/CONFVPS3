@@ -2,6 +2,7 @@
 b="\033[1;37m"
 v="\033[1;32m"
 Ver="\033[1;31m"
+echo 'bash /bin/vps' > /bin/VPS
 
 clear
 read -p "Digite Seu Nome: " nome
@@ -32,7 +33,7 @@ echo -e "\033[1;32mInstalando CONFVPS..."
 cd
 mkdir install
 cd install
-wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/VPS > VPS
+wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/vps > vps
 wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/speedtest > speedtest
 wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/limite > limite
 for arqs in `ls`
@@ -46,4 +47,4 @@ rm -rf install
 rm -rf install.sh
 echo -e "\033[1;32mInstalado."
 echo ''
-echo -e "\033[1;32mExculte o comando \033[1;37mVPS\033[1;37m"
+echo -e "\033[1;32mExculte o comando \033[1;37mvps\033[1;37m"
