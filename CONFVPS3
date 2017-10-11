@@ -63,7 +63,9 @@ echo "http_port 80
 http_port 8080 
 http_port 8799 
 http_port 3128 visible_hostname $donu 
-acl ip dstdomain $IP http_access allow ip" > /etc/squid/squid.conf echo 'acl accept dstdomain -i "/etc/payloads"
+acl ip dstdomain $IP 
+http_access allow ip" > /etc/squid/squid.conf 
+echo 'acl accept dstdomain -i "/etc/payloads"
 http_access allow accept 
 acl local dstdomain localhost 
 http_access allow local 
@@ -106,7 +108,9 @@ echo "http_port 80
 http_port 8080 
 http_port 8799 
 http_port 3128 visible_hostname $donu 
-acl ip dstdomain $IP http_access allow ip" > /etc/squid/squid.conf echo 'acl accept dstdomain -i "/etc/payloads"
+acl ip dstdomain $IP 
+http_access allow ip" > /etc/squid/squid.conf 
+echo 'acl accept dstdomain -i "/etc/payloads"
 http_access allow accept 
 acl local dstdomain localhost 
 http_access allow local 
@@ -1376,10 +1380,6 @@ b="\033[1;37m"
 v="\033[1;32m"
 Ver="\033[1;31m"
 clear
-while :
-do
-deluserr ()
-{
 clear
 echo -e "==================Usuarios===================="
 awk -F : '$3 >= 1000 { print $1 }' /etc/passwd | grep -v "nobody"| grep -v "glemysson" > /tmp/users.txt
@@ -1398,8 +1398,7 @@ fi
 echo -e "$b["$v"$c$b] -$Ver $usuario"
 echo "$i: $usuario" >> /tmp/users
 done < /tmp/users.txt
-}
-deluserr
+
 echo ''
 if [[ -f /tmp/users ]]; then
 mum=$(cat /tmp/users | wc -l)
@@ -1414,14 +1413,6 @@ echo -e "\033[1;31mVoce nao tem usuarios existente\033[1;37m"
 exit
 fi
 echo -n -e "\033[1;37mQual deseja deletar: ";read del
-if [[ "$del" = [1-1000] ]]; then
-true
-else
-echo -e "\033[91mopcao invalida"
-sleep 1
-deluserr
-exit
-fi
 if [[ "$del" = '0' ]]; then
 CONFVPS3
 fi
@@ -1444,11 +1435,6 @@ pids=$(ps -u $us 1>/dev/null 2>/dev/null |awk {'print $1'})
  kill "$pids" >/dev/null 2>/dev/null
  userdel -f $us 1>/dev/null 2>/dev/null
 echo -e "Usuario \033[1;32m$us\033[1;37m Deletado"
-read -p "Continuar ou 0 pra voltar ao menu: " opt
-if [[ $opt = 0 ]]; then
-CONFVPS3
-fi
-done
 ;;
 2)
 clear
@@ -1542,37 +1528,30 @@ fi
 user
 ;;
 7)
-echo -e "$b---------------------------------------------------------\033[0m"
-echo -e "\033[47;30m "$Ver"Usuario.C        Senha.U         Data E.       Logins S.\033[0m"
-echo -e "$b---------------------------------------------------------\033[0m"
+#!/bin/bash
+clear
+echo -e "$b------------------------------------------------------------\033[0m"
+echo -e "\033[47;30m "$Ver"Usuario C.        Senha U.         Data E.        Logins S.\033[0m"
+echo -e "$b------------------------------------------------------------\033[0m"
 for users in `awk -F : '$3 > 900 { print $1 }' /etc/passwd |sort |grep -v "nobody" |grep -vi polkitd |grep -vi system-`
 do
-
-if cat /etc/CONFVPS/limite/$users > /dev/null 2> /dev/null
-then
-limitecs=$(cat /etc/CONFVPS/limite/$users)
+if [[ -f /etc/CONFVPS3/users-info/$users ]]; then
+usuario=$(cat /etc/CONFVPS3/users-info/$users | awk -F : '{print $1}')
+senha=$(cat /etc/CONFVPS3/users-info/$users | awk -F : '{print $2}')
+data=$(cat /etc/CONFVPS3/users-info/$users | awk -F : '{print $3}')
+limitee=$(cat /etc/CONFVPS3/users-info/$users | awk -F : '{print $4}')
 else
-limitecs="null"
-fi
-
-if senha=$(cat /etc/CONFVPS/senha/$users > /dev/null 2> /dev/null)
-then
-senha=$(cat /etc/CONFVPS/senha/$users)
-else
+limitee="null"
+usuario=$users
+data="null"
 senha="null"
 fi
-
-data=$(chage -l $users |grep -i co |awk -F : '{print $2}')
-if [ $data = never ] 2> /dev/null
-then
-date="null"
-fi
-detalhesdata=$(printf '%-18s' "$data")
-detalheslimit=$(printf '%-10s' "$limitecs")
-detalhes=$(printf ' %-15s' "$users")
-detalhespass=$(printf '%-13s' "$senha")
+detalhesdata=$(printf '%-17s' "$data")
+detalheslimit=$(printf '%-1s' "$limitee")
+detalhes=$(printf ' %-16s' "$usuario")
+detalhespass=$(printf '%-14s' "$senha")
 echo -e "$v  $detalhes $detalhespass $detalhesdata $detalheslimit\033[0m"
-echo -e "$b---------------------------------------------------------\033[0m"
+echo -e "$b------------------------------------------------------------\033[0m"
 done
 exit
 ;;
@@ -2139,29 +2118,29 @@ h2=$(date| awk {'print $4'}|awk -F : {'print $2'})
 dia=$(date | awk {'print $3'})
 mes=$(date | awk {'print $2'})
 ano=$(date | awk {'print $6'})
-if [[ "$mes" = "jan" || "$mes" = "jan" ]]; then
+if [[ "$mes" = "Jan" || "$mes" = "Jan" ]]; then
 mes=01
-elif [[ "$mes" = "feb" || "$mes" = "fev" ]]; then
+elif [[ "$mes" = "Feb" || "$mes" = "Fev" ]]; then
 mes=02
-elif [[ "$mes" = "mar" || "$mes" = "mar" ]]; then
+elif [[ "$mes" = "Mar" || "$mes" = "Mar" ]]; then
 mes=03
-elif [[ "$mes" = "apr" || "$mes" = "abr" ]]; then
+elif [[ "$mes" = "Apr" || "$mes" = "Abr" ]]; then
 mes=04
-elif [[ "$mes" = "may" || "$mes" = "mai" ]]; then
+elif [[ "$mes" = "May" || "$mes" = "Mai" ]]; then
 mes=05
-elif [[ "$mes" = "jun" || "$mes" = "jun" ]]; then
+elif [[ "$mes" = "Jun" || "$mes" = "Jun" ]]; then
 mes=06
-elif [[ "$mes" = "jul" || "$mes" = "jul" ]]; then
+elif [[ "$mes" = "Jul" || "$mes" = "Jul" ]]; then
 mes=07
-elif [[ "$mes" = "ago" || "$mes" = "ago" ]]; then
+elif [[ "$mes" = "Ago" || "$mes" = "Ago" ]]; then
 mes=08
-elif [[ "$mes" = "set" || "$mes" = "sep" ]]; then
+elif [[ "$mes" = "Set" || "$mes" = "Sep" ]]; then
 mes=09
-elif [[ "$mes" = "out" || "$mes" = "oct" ]]; then
+elif [[ "$mes" = "Out" || "$mes" = "Oct" ]]; then
 mes=10
-elif [[ "$mes" = "nov" || "$mes" = "nov" ]]; then
+elif [[ "$mes" = "Nov" || "$mes" = "Nov" ]]; then
 mes=11
-elif [[ "$mes" = "dec" || "$mes" = "dez" ]]; then
+elif [[ "$mes" = "Dec" || "$mes" = "Dez" ]]; then
 mes=12
 fi
 echo -e "$b============================================================="
