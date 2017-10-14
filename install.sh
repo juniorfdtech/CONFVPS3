@@ -47,4 +47,4 @@ rm -rf install
 rm -rf install.sh
 echo -e "\033[1;32mInstalado."
 echo ''
-echo -e "\033[1;32mExculte o comando \033[1;37mvps\033[1;37m"
+echo -e "\033[1;32mExculte o comando \033[1;37mCONFVPS3\033[1;37m"
