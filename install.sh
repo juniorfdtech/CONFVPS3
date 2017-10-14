@@ -33,7 +33,7 @@ echo -e "\033[1;32mInstalando CONFVPS..."
 cd
 mkdir install
 cd install
-wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/vps > vps
+wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/CONFVPS3 > CONFVPS3
 wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/speedtest > speedtest
 wget -o /dev/null -O- https://raw.githubusercontent.com/GlEmYsSoN-LiNuX/CONFVPS3/master/limite > limite
 for arqs in `ls`
